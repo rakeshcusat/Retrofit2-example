@@ -8,6 +8,9 @@
 # Java class files
 *.class
 
+# Python class files
+*.pyc
+
 # Generated files
 bin/
 gen/
@@ -35,6 +38,10 @@ captures/
 # Intellij
 *.iml
 .idea/workspace.xml
+Retrofit2Android/.idea/*
 
 # Keystore files
 *.jks
+
+# Mack hidden files
+.DS_Store

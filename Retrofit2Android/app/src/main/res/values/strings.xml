@@ -1,0 +1,7 @@
+<resources>
+   <string name="app_name">Retrofit2Android</string>
+   <string name="name">Name</string>
+   <string name="add">Add</string>
+   <string name="get">Get</string>
+   <string name="user_id">User Id</string>
+</resources>

@@ -1,0 +1,1 @@
+web: gunicorn retrofit2server.app:app --preload --log-level=DEBUG --log-file=-
