@@ -19,12 +19,17 @@ import com.code4reference.retrofit2android.adapter.UserListAdapter;
 import com.code4reference.retrofit2android.model.User;
 import com.code4reference.retrofit2android.model.UserList;
 import com.code4reference.retrofit2android.service.ServiceFactory;
+import com.google.gson.Gson;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -84,8 +89,10 @@ public class MainActivity extends AppCompatActivity {
          case R.id.get_user_button:
                if (!userIdEditText.getText().toString().isEmpty()
                    && -1 <= Long.valueOf(-1).compareTo(Long.valueOf(userIdEditText.getText().toString()))) {
-
+                  // Retorfit synchronous call wrapped in AsyncTask.
                   new ApiTask().execute(Long.valueOf(userIdEditText.getText().toString()));
+                  // Non-Retrofit synchronous call wrapped in AsyncTask
+//                  new NonRetrofitTask().execute(Long.valueOf(userIdEditText.getText().toString()));
                } else {
                   Toast.makeText(this, "Invalid userId", Toast.LENGTH_SHORT).show();
                }
@@ -184,6 +191,69 @@ public class MainActivity extends AppCompatActivity {
          } catch(IOException e) {
             e.printStackTrace();
          }
+         return null;
+      }
+
+      @Override
+      protected void onPostExecute(@Nullable final String name){
+         String message;
+         if (name == null) {
+            message = "Couldn't find any name for given id";
+         } else {
+            message = String.format(Locale.ENGLISH, "Name: %s", name);
+            if (userIdEditText != null){
+               userIdEditText.setText("");
+            }
+         }
+         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+      }
+   }
+
+   /**
+    * This async task doesn't use Retrofit to communicate with RESTful api.
+    */
+   private class NonRetrofitTask extends AsyncTask<Long, Void, String> {
+      private final String TAG = NonRetrofitTask.class.getSimpleName();
+
+      @Override
+      @Nullable
+      protected String doInBackground(Long... userIds) {
+         InputStream is = null;
+         int len = 500;
+         try {
+            URL url = new URL(String.format(Locale.ENGLISH, "%s/api/user/%d", ServiceFactory.BASE_URL, userIds[0]));
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setReadTimeout(10000 /* milliseconds */);
+            conn.setConnectTimeout(15000 /* milliseconds */);
+            conn.setRequestMethod("GET");
+            conn.setDoInput(true);
+            // Starts the query
+            conn.connect();
+            int response = conn.getResponseCode();
+            Log.d(TAG, "The response is: " + response);
+            if (response < 200 || response >= 400){
+               Log.d(TAG, "unsuccessful response");
+               return null;
+            }
+            is = conn.getInputStream();
+
+            final Reader reader = new InputStreamReader(is, "UTF-8");
+            User user = new Gson().fromJson(reader, User.class);
+
+            return user != null ? user.getName() : null;
+
+         } catch(IOException e) {
+            e.printStackTrace();
+         }  finally {
+            if (is != null) {
+               try {
+                  is.close();
+               } catch(IOException e) {
+                  e.printStackTrace();
+               }
+            }
+         }
+
          return null;
       }
 

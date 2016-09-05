@@ -1,0 +1,8 @@
+<lint>
+   <issue id="InvalidPackage">
+      <!-- We can safely ignore these warning -->
+      <!-- https://github.com/square/okio/issues/58 -->
+      <ignore regexp="okio-1.8.0.jar"/>
+      <ignore regexp="retrofit-2.1.0.jar"/>
+   </issue>
+</lint>

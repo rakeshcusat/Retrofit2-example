@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
  * This is a Singleton Factory class to generate the service instance.
  */
 public final class ServiceFactory {
+   public static final String BASE_URL = "http://10.0.2.2:5000";
 
    private static UserService userService;
 
@@ -36,7 +37,7 @@ public final class ServiceFactory {
                                                  .addInterceptor(interceptor).build();
 
          userService = new Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:5000")
+            .baseUrl(BASE_URL)
             // To enable http request and response logging
             .client(client)
             // This uses the GSON to convert json string to object and vice-versa.
